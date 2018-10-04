@@ -1,5 +1,8 @@
 package edu.princeton.cs.algs4.sachin;
 
+import edu.princeton.cs.algs4.StdIn;
+import edu.princeton.cs.algs4.StdOut;
+
 /**
  * Dynamic Connectivity Problem :-
  * 
@@ -20,28 +23,71 @@ package edu.princeton.cs.algs4.sachin;
  * @author Sachin
  *
  */
-public class UnionFind implements UFI {
+public class QuickFind implements UFI {
+
+	private final int[] id;
+	// number of connected component
+	private int count;
+
+	public QuickFind(int N) {
+		// initialize connected components to N
+		count = N;
+		id = new int[N];
+		for (int i = 0; i < N; i++) {
+			id[i] = i;
+		}
+	}
 
 	public void union(int p, int q) {
-		// TODO Auto-generated method stub
+		// Put p and q into same component
+		int pID = id[p];
+		int qID = id[q];
 
+		// Nothing to do if p and q are in same component
+		if (pID == qID)
+			return;
+
+		// rename p's component to q's name
+		for (int i = 0; i < id.length; i++)
+			if (id[i] == pID)
+				id[i] = qID;
+
+		// we go through the array, changing all the entries with values equal to id[p] to the value id[q].
+		// We could have decided to change all the entries equal to id[q] to the value id[p] — the choice
+		// between these two alternatives is arbitrary.
+
+		count--;
 	}
 
 	public int find(int p) {
-		// TODO Auto-generated method stub
-		return 0;
+		// return connected component number. as we maintain one number for all the nodes in the component,
+		// it would be single number
+		return id[p];
 	}
 
 	public boolean connected(int p, int q) {
-		// TODO Auto-generated method stub
-		return false;
+		return find(p) == find(q);
 	}
 
 	public int count() {
-		// TODO Auto-generated method stub
-		return 0;
+		return count;
 	}
 
+	public static void main(String[] args) {
+		int N = StdIn.readInt();
+		QuickFind quickFind = new QuickFind(N);
+
+		while (!StdIn.isEmpty()) {
+			int p = StdIn.readInt();
+			int q = StdIn.readInt();
+
+			if (quickFind.connected(p, q))
+				continue;
+
+			quickFind.union(p, q);
+			StdOut.println(p + " " + q);
+		}
+	}
 }
 
 /**
