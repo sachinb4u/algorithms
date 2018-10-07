@@ -1,5 +1,7 @@
 package edu.princeton.cs.algs4.sachin;
 
+import java.util.Arrays;
+
 import edu.princeton.cs.algs4.StdIn;
 import edu.princeton.cs.algs4.StdOut;
 
@@ -86,7 +88,24 @@ public class QuickFind implements UFI {
 
 			quickFind.union(p, q);
 			StdOut.println(p + " " + q);
+			StdOut.println(quickFind.showUnions());	
 		}
+		StdOut.println(quickFind.count + " components");
+		
+	}
+	
+	public String showUnions() {
+		StringBuilder builder = new StringBuilder();
+		builder.append("     ");
+		for(int i=0; i <id.length;i++) {
+			builder.append(i );
+			builder.append(", ");
+		}
+		builder.replace(builder.length()-2, builder.length(), " ");
+	    builder.append("\n    ");
+		builder.append(Arrays.toString(id));
+		builder.append("\n");
+		return builder.toString();
 	}
 }
 
