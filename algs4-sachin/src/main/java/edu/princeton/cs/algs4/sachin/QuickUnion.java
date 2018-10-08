@@ -2,9 +2,6 @@ package edu.princeton.cs.algs4.sachin;
 
 import java.util.Arrays;
 
-import edu.princeton.cs.algs4.StdIn;
-import edu.princeton.cs.algs4.StdOut;
-
 public class QuickUnion implements UFI {
 
 	private int[] id;
@@ -12,7 +9,7 @@ public class QuickUnion implements UFI {
 
 	public QuickUnion(int N) {
 		id = new int[N];
-		
+
 		// initialize to N connected components
 		count = N;
 
@@ -50,36 +47,8 @@ public class QuickUnion implements UFI {
 		return count;
 	}
 
-	public String showUnions() {
-		StringBuilder builder = new StringBuilder();
-		builder.append("     ");
-		for (int i = 0; i < id.length; i++) {
-			builder.append(i);
-			builder.append(", ");
-		}
-		builder.replace(builder.length() - 2, builder.length(), " ");
-		builder.append("\n    ");
-		builder.append(Arrays.toString(id));
-		builder.append("\n");
-		return builder.toString();
+	public int[] getId() {
+		return id;
 	}
 
-	public static void main(String[] args) {
-		int N = StdIn.readInt();
-
-		QuickUnion quickUnion = new QuickUnion(N);
-
-		for (int i = 0; i < N; i++) {
-			int p = StdIn.readInt();
-			int q = StdIn.readInt();
-
-			if (quickUnion.connected(p, q))
-				continue;
-
-			quickUnion.union(p, q);
-			StdOut.println(p + " " + q);
-			StdOut.println(quickUnion.showUnions());
-		}
-		StdOut.println(quickUnion.count + " components");
-	}
 }
