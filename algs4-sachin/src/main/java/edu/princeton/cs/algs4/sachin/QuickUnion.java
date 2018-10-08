@@ -1,7 +1,5 @@
 package edu.princeton.cs.algs4.sachin;
 
-import java.util.Arrays;
-
 public class QuickUnion implements UFI {
 
 	private int[] id;
