@@ -74,7 +74,10 @@ public class Percolation {
     public boolean isFull(int row, int col) {
         checkIfValid(row, col);
 
-        return !isOpen(row, col);
+        int id1 = rowCol2Id(row, col);
+
+        // site is open and connected to virtual top
+        return isOpen(row, col) && sites.connected(0, id1);
     }
 
     public int numberOfOpenSites() {
@@ -88,7 +91,7 @@ public class Percolation {
     }
 
     private boolean isValidSite(int num) {
-        return num >= 1 || num <= n;
+        return num >= 1 && num <= n;
     }
 
     private boolean isValid(int row, int col) {
@@ -106,9 +109,6 @@ public class Percolation {
     }
 
     public static void main(String[] args) {
-//		Scanner scanner = new Scanner(Paths.get("src/test/resources/percolation-input/wayne98.txt"));
-//		StdIn.setScanner(scanner);
-
         int n = StdIn.readInt();
 
         Percolation percolation = new Percolation(n);

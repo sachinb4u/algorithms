@@ -39,18 +39,14 @@ public class PercolationStats {
 
             }
             thresholds[t] = (double) perc.numberOfOpenSites() / (n * n);
-//			System.out.println(String.format("For %d trial, percolated on %d / %d, prob= %f", t+1, perc.numberOfOpenSites(), N*N, thresholds[t]));
 
         }
 
-//		System.out.println("Thresholds = " + Arrays.toString(thresholds));
         System.out.println("mean = " + mean());
         System.out.println("stddev = " + stddev());
         System.out.println("95 % confidence interval = [" + confidenceLo() + "," + confidenceHi() + "]");
 
     }
-
-//	}
 
     public double mean() {
         return StdStats.mean(thresholds);
