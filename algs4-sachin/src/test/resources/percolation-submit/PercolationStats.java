@@ -1,111 +1,81 @@
-import java.security.SecureRandom;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Random;
-import java.util.concurrent.Callable;
-import java.util.concurrent.ForkJoinPool;
-import java.util.concurrent.Future;
+import edu.princeton.cs.algs4.StdRandom;
+import edu.princeton.cs.algs4.StdStats;
 
 public class PercolationStats {
 
-	int N;
-	int trials;
-	int[] numsites;
+    private static final double CONFIDENCE_95 = 1.96;
+    private final int n;
+    private final int trials;
+    private final double[] thresholds;
 
-	public PercolationStats(int n, int trials) {
-		if (n <= 0 || trials <= 0)
-			throw new IllegalArgumentException(String.format("Illegal n = %d and/or trials = %d", n, trials));
+    public PercolationStats(int num, int trials) {
+        if (num <= 0 || trials <= 0)
+            throw new IllegalArgumentException(String.format("Illegal n = %d and/or trials = %d", num, trials));
 
-		this.N = n;
-		this.trials = trials;
-		numsites = new int[trials];
+        this.n = num;
+        this.trials = trials;
+        thresholds = new double[trials];
 
-		execute();
-	}
+    }
 
-	private void execute() {
+    private void execute() {
 
-		ForkJoinPool forkJoinPool = new ForkJoinPool();
-		List<Future<Integer>> fts = new ArrayList<Future<Integer>>();
-		for (int i = 0; i < trials; i++) {
-			fts.add(forkJoinPool.submit(new PercolationTask(N)));
-		}
-		forkJoinPool.shutdown();
-		int i = 0;
-		for (Future<Integer> ft : fts) {
-			try {
-				numsites[i++] = ft.get();
-			} catch (Exception e) {
-				e.printStackTrace();
-			}
-		}
+        for (int t = 0; t < trials; t++) {
+            Percolation perc = new Percolation(n);
 
-		double mean = 0, sum = 0, std = 0;
-		for (int j = 0; j < numsites.length; j++) {
-			sum += numsites[j];
-		}
+            while (!perc.percolates()) {
 
-		mean = sum / numsites.length;
+                int num1 = StdRandom.uniform(1, n * n);
 
-		for (int j = 0; j < numsites.length; j++) {
-			std += Math.pow(numsites[j] - mean, 2);
-		}
-		std = Math.sqrt(std / numsites.length);
+                int c1 = num1 % n == 0 ? n : num1 % n;
+                int r1 = num1 % n == 0 ? num1 / n : num1 / n + 1;
 
-		System.out.println("mean = " + mean);
-		System.out.println("std = " + std);
-	}
+                perc.open(r1, c1);
+                /*
+                 * System.out.println(String.
+                 * format("random = %d, (%3d, %3d) Perculated? =%6b, NumberOfOpenSites = %5s ", num1, r1, c1,
+                 * perc.percolates(), perc.numberOfOpenSites()));
+                 */
 
-	class PercolationTask implements Callable<Integer> {
-		int n;
+            }
+            thresholds[t] = (double) perc.numberOfOpenSites() / (n * n);
+//			System.out.println(String.format("For %d trial, percolated on %d / %d, prob= %f", t+1, perc.numberOfOpenSites(), N*N, thresholds[t]));
 
-		public PercolationTask(int n) {
-			this.n = n;
-		}
+        }
 
-		public Integer call() throws Exception {
-			Random random = SecureRandom.getInstanceStrong();
-			Percolation perc = new Percolation(n);
+//		System.out.println("Thresholds = " + Arrays.toString(thresholds));
+        System.out.println("mean = " + mean());
+        System.out.println("stddev = " + stddev());
+        System.out.println("95 % confidence interval = [" + confidenceLo() + "," + confidenceHi() + "]");
 
-			while (!perc.percolates()) {
-				int num1 = random.nextInt(n);
-				int num2 = random.nextInt(n);
-//				System.out.println(String.format("num1 = %d, num2 = %d", num1, num2));
-				if ((num1 > 0 && num1 <= n) && (num2 > 0 && num2 <= n)) {
-					System.out.println(String.format("n1 = %d, n2 = %d", num1, num2));
-					perc.open(num1, num2);
-					
-				}
-			}
-			return perc.numberOfOpenSites();
-		}
+    }
 
-	}
+//	}
 
-	public double mean() {
-		return 0;
-	}
+    public double mean() {
+        return StdStats.mean(thresholds);
+    }
 
-	public double stddev() {
-		return 0;
-	}
+    public double stddev() {
+        return StdStats.stddev(thresholds);
+    }
 
-	public double confidenceLo() {
-		return 0;
-	}
+    public double confidenceLo() {
+        return mean() - ((CONFIDENCE_95 * stddev()) / Math.sqrt(trials));
+    }
 
-	public double confidenceHi() {
-		return 0;
-	}
+    public double confidenceHi() {
+        return mean() + ((CONFIDENCE_95 * stddev()) / Math.sqrt(trials));
+    }
 
-	public static void main(String[] args) {
-		args = new String[] { "5", "1" };
-		if (args.length >= 2) {
-			int n = Integer.parseInt(args[0]);
-			int trials = Integer.parseInt(args[1]);
+    public static void main(String[] args) {
+        if (args.length >= 2) {
+            int n = Integer.parseInt(args[0]);
+            int trials = Integer.parseInt(args[1]);
 
-			PercolationStats stats = new PercolationStats(n, trials);
-		}
+            PercolationStats stats = new PercolationStats(n, trials);
+            stats.execute();
+        }
 
-	}
+    }
 }
